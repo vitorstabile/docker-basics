@@ -159,3 +159,15 @@ Now we can launch our Postgres database with docker compose:
 ```
 docker-compose up -d
 ```
+
+
+OBS: This Docker image of Postgres will create another random volume, different from the dbtuto, creating in total two volumes. 
+
+
+<br>
+
+<div align="center"><img src="img/volumes-w1590-h171.png" width=1590 height=171><br><sub>Two Volumes - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+This happens when the image you are using defines a VOLUME in the Dockerfile to a container path that you do not define as a volume in your run command. Docker creates the guid for the volume name when you have a volume without a source, aka an anonymous volume. You can use docker image inspect on the image to see the volumes defined in that image. If you inspect the container (docker container inspect), you'll see that your volume is being used, it's just that there's a second anonymous volume to a different path also being used.
