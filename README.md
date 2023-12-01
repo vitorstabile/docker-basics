@@ -29,7 +29,7 @@ Create the Dockerfile in a directory
 
 <br>
 
-<div align="center"><img src="img/dockerfile-w668-h104.png" width=668 height=104><br><sub>Dockerfile - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+<div align="center"><img src="img/dockerfile-w638-h160.png" width=638 height=160><br><sub>Dockerfile - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
 
@@ -50,8 +50,6 @@ This folder in your Postgres container is where you can add additional initializ
 **Create a docker-compose file**
 
 Once you have created your docker file, now to run the Postgres container in a clean way, you can create a docker-compose.yml file.
-
-
 
 ```
 services:
@@ -132,6 +130,12 @@ VALUES
 ```
 
 We start the names of those 2 files with ```01-*``` and ```02-*``` because these initialization files will be executed in sorted name. So we want the database to be created first, then load the data.
+
+<br>
+
+<div align="center"><img src="img/dockercompose_env-w675-h426.png" width=426 height=160><br><sub>All Files - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
 
 ***Run our Postgres container***
 
