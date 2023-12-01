@@ -46,3 +46,97 @@ COPY *.sql /docker-entrypoint-initdb.d/
 Note that the line ```COPY``` below will copy all the sql files in our source folder, where we have our Dockerfile, and add them in the ```/docker-entrypoint-initdb.d/```
 
 This folder in your Postgres container is where you can add additional initialization scripts (creating the directory if necessary).
+
+**Create a docker-compose file**
+
+Once you have created your docker file, now to run the Postgres container in a clean way, you can create a docker-compose.yml file.
+
+
+
+```
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    image: "postgres-tutorials"
+    container_name: ${PG_CONTAINER_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+       - dbtuto:/data/postgres-tuto
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+volumes:
+    dbtuto:
+      external: true
+```
+
+The values which are in this form ```${PG_CONTAINER_NAME}``` have been defined in an env file; to be managed easily. To do so, create a ```.env``` file in your source folder and add all the environment variables, like below.
+
+```
+PG_CONTAINER_NAME='postgres_tuto'
+POSTGRES_USER='tuto'
+POSTGRES_PASSWORD='admingres'
+POSTGRES_DB='tutos'
+PGDATA='/data/postgres-tuto'
+```
+
+***Create SQL scripts files***
+
+Now that our compose file is ready, we can create our SQL scripts file that must be copied in ```/docker-entrypoint-initdb.d/```
+
+File: ```01-init-db.sql```
+
+```
+-- CREATE TYPE
+DROP TYPE IF EXISTS genre;
+CREATE TYPE genre AS ENUM (
+    'ADVENTURE',
+    'HORROR',
+    'COMEDY',
+    'ACTION',
+    'SPORTS'
+);
+
+-- CREATE TABLE
+DROP TABLE IF EXISTS movies;
+CREATE TABLE movies (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    release_year SMALLINT,
+    genre genre,
+    price NUMERIC(4, 2)
+);
+```
+
+File: ```02-load-data.sql```
+
+We start the names of those 2 files with ```01-*``` and ```02-*``` because these initialization files will be executed in sorted name. So we want the database to be created first, then load the data.
+
+***Run our Postgres container***
+
+Before running our Postgres container, we have specified in our docker-compose file that we will use an external volume.
+
+```
+# Here ↓
+volumes:
+    dbtuto:
+      external: true
+```
+
+So in other to have an external volume we have to create it:
+
+```
+docker volume create dbtuto
+```
+
+Now we can launch our Postgres database with docker compose:
+
+```
+docker-compose up -d
+```
