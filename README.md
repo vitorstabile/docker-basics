@@ -12,7 +12,11 @@
 	- [Chapter 1 - Part 7: Understanding Docker Terminology](#chapter1part7)
 	- [Chapter 1 - Part 8: Essential Docker Commands List](#chapter1part8)
 2. [Chapter 2: Work with Docker](#chapter2)
-    - [Chapter 2 - Part 1: Creating Docker Images](#chapter2part1)
+    - [Chapter 2 - Part 1: Creating Docker Image of a Spring Boot Application](#chapter2part1)
+	- [Chapter 2 - Part 2: Creating Docker Image Using Multi Stage Dockerfile](#chapter2part2)
+	- [Chapter 2 - Part 3: Optimizing Dockerfile](#chapter2part3)
+	- [Chapter 2 - Part 4: Creating Docker Image with Spring Boot Maven Plugin](#chapter2part4)
+	- [Chapter 2 - Part 5: Creating Postgres Docker Container](#chapter2part5)
 
 ## <a name="chapter1"></a>Chapter 1: Introducing to Docker
 
@@ -166,7 +170,7 @@ sudo docker run hello-world
 
 ## <a name="chapter1"></a>Chapter 2: Work with Docker
   
-#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Creating Docker Images
+#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Creating Docker Image of a Spring Boot Application
 
 What we want, is create a Docker Image for the test application.
 
@@ -243,11 +247,13 @@ CONTAINER ID   IMAGE                       COMMAND                CREATED       
 327549cef943   dockertest/hello-world:v1   "java -jar /app.jar"   4 minutes ago   Up 4 minutes   0.0.0.0:5000->5000/tcp   flamboyant_black
 ```
 
-To use docker, first you will need to install it.
+#### <a name="chapter2part2"></a>Chapter 2 - Part 2: Creating Docker Image Using Multi Stage Dockerfile
 
-In Windows, you could install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/).
+#### <a name="chapter2part3"></a>Chapter 2 - Part 3: Optimizing Dockerfile
 
-**Create a Dockerfile**
+#### <a name="chapter2part4"></a>Chapter 2 - Part 4: Creating Docker Image with Spring Boot Maven Plugin
+
+#### <a name="chapter2part5"></a>Chapter 2 - Part 5: Creating Postgres Docker Container
 
 First, to start a Postgres database in a docker container, we have to create a Dockerfile.
 
