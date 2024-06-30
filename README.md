@@ -3,15 +3,166 @@
 # Content
 
 1. [Chapter 1: Introducing to Docker](#chapter1)
-    - [Chapter 1 - Part 1: What is Docker?](#chapter1part1)
+    - [Chapter 1 - Part 1: How does Traditional Deployment Work?](#chapter1part1)
+    - [Chapter 1 - Part 2: Understanding Deployment Process with Docker](#chapter1part2)
+	- [Chapter 1 - Part 3: How does Docker Make it Easy?](#chapter1part3)
+	- [Chapter 1 - Part 4: Why is Docker Popular?](#chapter1part4)
+	- [Chapter 1 - Part 5: Understanding How Docker Works](#chapter1part5)
+	- [Chapter 1 - Part 6: What's happening in the Background?](#chapter1part6)
+	- [Chapter 1 - Part 7: Understanding Docker Terminology](#chapter1part7)
+	- [Chapter 1 - Part 8: Essential Docker Commands List](#chapter1part8)
 2. [Chapter 2: Create a Container in Docker](#chapter2)
     - [Chapter 2 - Part 1: How to Create a Postgres Database in Docker?](#chapter2part1)
 
 ## <a name="chapter1"></a>Chapter 1: Introducing to Docker
-  
-#### <a name="chapter1part1"></a>Chapter 1 - Part 1: What is Docker?
 
-Java Spring Framework (Spring Framework) is a popular, open source, enterprise-level framework for creating standalone, production-grade applications that run on the Java Virtual Machine (JVM).
+#### <a name="chapter1part1"></a>Chapter 1 - Part 1: How does Traditional Deployment Work?
+
+- Deployment process described in a document
+
+- Operations team follows steps to:
+  - Setup Hardware
+  - Setup OS (Linux, Windows, Mac, ...)
+  - Install Soware (Java, Python, NodeJs, ...)
+  - Setup Application Dependencies
+  - Install Application
+  
+- Manual approach:
+  - Takes a lot of time
+  - High chance of making mistakes
+  
+#### <a name="chapter1part2"></a>Chapter 1 - Part 2: Understanding Deployment Process with Docker
+
+- **Simplified** Deployment Process:
+  - OS doesn't matter
+  - Programming Language does not matter
+  - Hardware does not matter
+  
+- **01:** Developer creates a Docker Image
+
+- **02:** Operations run the Docker Image
+  - Using a very simple command
+  
+- **Takeaway:** Once you have a Docker Image, irrespective of what the docker image contains, you run it the same way!
+  - Make your operations team happy
+  
+#### <a name="chapter1part3"></a>Chapter 1 - Part 3: How does Docker Make it Easy?
+
+- Docker image **has everything you need to run your application:**
+  - Operating System
+  - Application Runtime (JDK or Python or NodeJS)
+  - Application code and dependencies
+  
+- You can run a Docker container **the same way** everywhere:
+  - Your local machine
+  - Corporate data center
+  - Cloud
+  
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Why is Docker Popular?
+  
+- Standaridized Application Package
+  - Same packaging for all types of applications
+    - Java, Python or Js
+
+- Multi Platform Support
+  - Local Machine, Data Center, Cloud (AWS, Azure and GCP)
+  
+- Isolation
+  - Containers have isolation from one another
+
+#### <a name="chapter1part5"></a>Chapter 1 - Part 5: Understanding How Docker Works
+
+<br>
+
+<div align="center"><img src="img/dockerarchitecture-w541-h390.png" width=541 height=390><br><sub>Docker Architecture - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+- All that you need is a Docker Runtime (like Docker Engine)
+
+
+<br>
+
+<div align="center"><img src="img/traditionaldeployvscontainer-w1280-h693.png" width=1280 height=693><br><sub>Tradional Deploy vs Container - (<a href='https://www.linkedin.com/pulse/traditional-os-vs-containers-muhammad-bilal-shakir'>Work by Muhammad Bilal</a>) </sub></div>
+
+<br>
+
+#### <a name="chapter1part6"></a>Chapter 1 - Part 6: What's happening in the Background?
+
+```
+docker container run -d -p 5000:5000 in28min/hello-world-nodejs:0.0.1.RELEASE 
+```
+
+- **Docker image** is downloaded from Docker Registry (Default: Docker Hub)
+  - https://hub.docker.com/r/in28min/hello-world-nodejs
+  - **Image** is a set of bytes
+  - **Container:** Running Image
+  - **in28min/hello-world-nodejs:** Repository Name
+  - **0.0.1.RELEASE:** Tag (or version)
+  - **-p hostPort:containerPort:** Maps internal docker port (container port) to a port on the host (host port)
+    - By default, Docker uses its own internal network called bridge network
+	- We are mapping a host port so that users can access your application
+  - **-d:** Detatched Mode (Don't tie up the terminal)
+
+#### <a name="chapter1part7"></a>Chapter 1 - Part 7: Understanding Docker Terminology
+
+<br>
+
+<div align="center"><img src="img/dockerregistry-w375-h427.png" width=375 height=427><br><sub>Docker Registry - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+ 
+- **Docker Image:** A package representing specific version of your application (or software)
+  - Contains everything your app needs
+    - OS, soware, code, dependencies
+
+-  **Docker Registry:** A place to store your docker images
+
+- **Docker Hub:** A registry to host Docker images
+
+- **Docker Repository:** Docker images for a specific app (tags are used to differentiate different images)
+
+- **Docker Container:** Runtime instance of a docker image
+
+- **Dockerfile:** File with instructions to create a Docker image
+
+#### <a name="chapter1part8"></a>Chapter 1 - Part 8: Essential Docker Commands List
+
+- In Windows, you could install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/).
+
+- In Linux
+
+  - Set up Docker's apt repository.
+
+```bash
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+
+  - Install the Docker packages.
+
+```bash
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+  - Verify that the Docker Engine installation is successful by running the hello-world image.
+  
+```bash
+sudo docker run hello-world
+```
+
+[Docker Commands](https://github.com/davidsims9t/docker-notes)
 
 ## <a name="chapter1"></a>Chapter 2: Create a Container in Docker
   
