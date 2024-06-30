@@ -11,8 +11,8 @@
 	- [Chapter 1 - Part 6: What's happening in the Background?](#chapter1part6)
 	- [Chapter 1 - Part 7: Understanding Docker Terminology](#chapter1part7)
 	- [Chapter 1 - Part 8: Essential Docker Commands List](#chapter1part8)
-2. [Chapter 2: Create a Container in Docker](#chapter2)
-    - [Chapter 2 - Part 1: How to Create a Postgres Database in Docker?](#chapter2part1)
+2. [Chapter 2: Work with Docker](#chapter2)
+    - [Chapter 2 - Part 1: Creating Docker Images](#chapter2part1)
 
 ## <a name="chapter1"></a>Chapter 1: Introducing to Docker
 
@@ -128,6 +128,8 @@ docker container run -d -p 5000:5000 in28min/hello-world-nodejs:0.0.1.RELEASE
 
 #### <a name="chapter1part8"></a>Chapter 1 - Part 8: Essential Docker Commands List
 
+- [Docker Commands](https://github.com/davidsims9t/docker-notes)
+
 - In Windows, you could install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/).
 
 - In Linux
@@ -162,11 +164,84 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo docker run hello-world
 ```
 
-[Docker Commands](https://github.com/davidsims9t/docker-notes)
-
-## <a name="chapter1"></a>Chapter 2: Create a Container in Docker
+## <a name="chapter1"></a>Chapter 2: Work with Docker
   
-#### <a name="chapter2part1"></a>Chapter 2 - Part 1: How to Create a Postgres Database in Docker?
+#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Creating Docker Images
+
+What we want, is create a Docker Image for the test application.
+
+```
+FROM openjdk:21
+COPY target/*.jar app.jar
+EXPOSE 5000
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+- Dockerfile contains instruction to create Docker images
+  - **FROM** - Sets a base image
+  - **COPY** - Copies new files or directories (target/*.jar) into image
+  - **EXPOSE** - Informs Docker about the port that the container listens on at runtime
+  - **ENTRYPOINT** - Configure a command that will be run at container launch
+  
+Open the application in IntelliJ
+
+<br>
+
+<div align="center"><img src="img/app-w492-h431.png" width=492 height=431><br><sub>App - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+Create a ```Dockerfile``` in the project an copy this instructions to it
+
+```
+FROM openjdk:21
+COPY target/*.jar app.jar
+EXPOSE 5000
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+<br>
+
+<div align="center"><img src="img/dockerfile-w1383-h571.png" width=1383 height=571><br><sub>Dockerfile - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+  
+Now, run a ```mvn clean install``` to create the jar file
+
+<br>
+
+<div align="center"><img src="img/jarfile-w1217-h310.png" width=1217 height=310><br><sub>Created the Jar file - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+Now, go to the folder that is located the ```Dockerfile``` and run the command
+
+```
+docker build -t dockertest/hello-world:v1 .
+```
+
+If we make a ```docker images``` we will see the image was created
+
+```
+REPOSITORY               TAG       IMAGE ID       CREATED         SIZE
+dockertest/hello-world   v1        7fc090a38583   2 minutes ago   524MB
+```
+
+Now, let's run the container by the created image
+
+```
+docker run -d -p 5000:5000 dockertest/hello-world:v1
+```
+
+Now, if we access http://localhost:5000/test, the container with the spring boot application is running
+
+To show if the container is running we can use ```docker ps```
+
+```
+CONTAINER ID   IMAGE                       COMMAND                CREATED         STATUS         PORTS
+  NAMES
+327549cef943   dockertest/hello-world:v1   "java -jar /app.jar"   4 minutes ago   Up 4 minutes   0.0.0.0:5000->5000/tcp   flamboyant_black
+```
 
 To use docker, first you will need to install it.
 
