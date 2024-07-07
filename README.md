@@ -198,9 +198,16 @@ Open the application in IntelliJ
 Create a ```Dockerfile``` in the project an copy this instructions to it
 
 ```
+# Use an official image with OpenJDK 21 to build the application
 FROM openjdk:21
+
+# Copy the created jar file after mvn clean install to the container
 COPY target/*.jar app.jar
+
+# Expose the port the application runs on
 EXPOSE 5000
+
+# Run the Spring Boot application
 ENTRYPOINT ["java","-jar","/app.jar"]
 ```
 
@@ -242,12 +249,95 @@ Now, if we access http://localhost:5000/test, the container with the spring boot
 To show if the container is running we can use ```docker ps```
 
 ```
-CONTAINER ID   IMAGE                       COMMAND                CREATED         STATUS         PORTS
-  NAMES
+CONTAINER ID   IMAGE                       COMMAND                CREATED         STATUS         PORTS                    NAMES
 327549cef943   dockertest/hello-world:v1   "java -jar /app.jar"   4 minutes ago   Up 4 minutes   0.0.0.0:5000->5000/tcp   flamboyant_black
 ```
 
 #### <a name="chapter2part2"></a>Chapter 2 - Part 2: Creating Docker Image Using Multi Stage Dockerfile
+
+One of the things that we have done earlier is that the jar file creation was done separately.
+
+We ran MVN clean install on our local machine and then we copied the jar into the docker image.
+
+The best practice is to build everything that is needed inside the Docker image.
+
+And for that reason what we will do now is we will build the jar file as part of the Docker image and then we will run it as part of the Docker image as well.
+
+And to be able to clearly separate these two, we have separated them into two different stages.
+
+The first stage is to build the jar file and the second stage is to run it.
+
+- Let build the jar file as part of creation of Docker Image
+
+- Your build does NOT make use of anything built on your local machine
+
+OBS: First, change the Java version of the pom.xml to 18.
+
+```
+<properties>
+	<java.version>18</java.version>
+</properties>
+```
+
+This is because, we can't find a maven image with openjdk 21.
+
+```
+# Use an official Maven image with OpenJDK 18 to build the application
+FROM maven:3.8.6-openjdk-18-slim AS build
+
+# Set the working directory in the container
+WORKDIR /home/app
+
+# Copy the source code into the container
+COPY . /home/app
+
+# Package the application
+RUN mvn -f /home/app/pom.xml clean package
+
+# Use the same OpenJDK 18 runtime as a parent image
+FROM openjdk:18.0-slim
+
+# Copy the JAR file from the build stage to the runtime stage
+COPY --from=build /home/app/target/*.jar app.jar
+
+# Expose the port the application runs on
+EXPOSE 5000
+
+# Run the Spring Boot application
+ENTRYPOINT [ "sh", "-c", "java -jar /app.jar" ]
+```
+
+We would want to be able to build the jar file. And to build the jar file we need Maven and that's why we are making use of this specific base image. ```maven:3.9.5-openjdk-21```
+
+This is open jdk plus Maven.
+
+Now, go to the folder that is located the ```Dockerfile``` and run the command
+
+```
+docker build -t dockertest/hello-world:v2 .
+```
+
+If we make a ```docker images``` we will see the image was created
+
+```
+REPOSITORY               TAG       IMAGE ID       CREATED         SIZE
+dockertest/hello-world   v2        fc8012db3793   3 minutes ago   430MB
+```
+
+Now, let's run the container by the created image
+
+```
+docker run -d -p 5000:5000 dockertest/hello-world:v2
+```
+
+Now, if we access http://localhost:5000/test, the container with the spring boot application is running
+
+To show if the container is running we can use ```docker ps```
+
+```
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                    NAMES
+731d10c6e877   dockertest/hello-world:v2   "sh -c 'java -jar /a…"   46 seconds ago   Up 45 seconds   0.0.0.0:5000->5000/tcp   affectionate_cohen
+```
 
 #### <a name="chapter2part3"></a>Chapter 2 - Part 3: Optimizing Dockerfile
 
