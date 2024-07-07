@@ -341,7 +341,127 @@ CONTAINER ID   IMAGE                       COMMAND                  CREATED     
 
 #### <a name="chapter2part3"></a>Chapter 2 - Part 3: Optimizing Dockerfile
 
+In the last step, we went to multi-stage approach and we saw that the build took a long time.
+
+Even if I was making a small code change, it was causing the entire application to be rebuilt again.
+
+How can we stop that from happening?
+
+One of the most important things that you need to understand is that Docker uses something called layering.
+
+And what Docker tries to do is to reuse layers as much as possible.
+
+So the most important thing that you need to ensure is that all the important things which do not change are present at the start of your build.
+
+When it comes to Java applications, the step which takes a long time is downloading the dependencies.
+
+However, the great thing is that you don't change dependencies very, very often.
+
+- Docker caches every layer and tries to reuse it
+
+- Let's make use of this feature to make our build efficient
+
+
+```
+# Use an official Maven image with OpenJDK 18 to build the application
+FROM maven:3.8.6-openjdk-18-slim AS build
+
+# Set the working directory in the container
+WORKDIR /home/app
+
+# Copy the pom.xml to source code into the container
+COPY ./pom.xml /home/app/pom.xml 
+
+# Copy the SpringBoot application entry point class (This not change in spring boot application)
+COPY ./src/main/java/com/dockerexample/test/TestApplication.java /home/app/src/main/java/com/dockerexample/test/TestApplication.java
+
+# Package the application
+RUN mvn -f /home/app/pom.xml clean package
+
+# Copy the source code into the container again
+COPY . /home/app
+
+# Package the application again. This will not take so long
+RUN mvn -f /home/app/pom.xml clean package
+
+# Use the same OpenJDK 18 runtime as a parent image
+FROM openjdk:18.0-slim
+
+# Copy the JAR file from the build stage to the runtime stage
+COPY --from=build /home/app/target/*.jar app.jar
+
+# Expose the port the application runs on
+EXPOSE 5000
+
+# Run the Spring Boot application
+ENTRYPOINT [ "sh", "-c", "java -jar /app.jar" ]
+```
+
+Now, go to the folder that is located the ```Dockerfile``` and run the command
+
+```
+docker build -t dockertest/hello-world:v3 .
+```
+
+The build process took  ```Building 56.6s (15/15) FINISHED```
+
+Now, let's run the container by the created image
+
+```
+docker run -d -p 5000:5000 dockertest/hello-world:v3
+```
+
+Now, let's make a change in the Controller. 
+
+
+```java
+@RestController
+public class TestController {
+
+    @GetMapping("/test")
+    public String helloWorld() {
+        return "Hello World From Docker v4";
+    }
+
+}
+```
+
+Now, go to the folder that is located the ```Dockerfile``` and run the command
+
+```
+docker build -t dockertest/hello-world:v4 .
+```
+
+The process took ```Building 9.9s (15/15) FINISHED```
+
+Stop the container v3 and star the v4.
+
+Now, let's run the container by the created image
+
+```
+docker run -d -p 5000:5000 dockertest/hello-world:v4
+```
+
+Now, if we access http://localhost:5000/test, the container with the spring boot application is running
+
+```
+Hello World From Docker v4
+```
+
 #### <a name="chapter2part4"></a>Chapter 2 - Part 4: Creating Docker Image with Spring Boot Maven Plugin
+
+- Spring Boot Maven Plugin: Provides Spring Boot support in Apache Maven
+  - Example: Create executable jar package
+  - Example: Run Spring Boot application
+  - Example: Create a Container Image
+  - **Commands:**
+    - mvn spring-boot:repackage (create jar or war)
+	  - Run package using java -jar
+	- mvn spring-boot:run (Run application)
+	- mvn spring-boot:start (Non-blocking. Use it to run integration tests.)
+	- mvn spring-boot:stop (Stop application started with start command)
+	- mvn spring-boot:build-image (Build a container image)
+
 
 #### <a name="chapter2part5"></a>Chapter 2 - Part 5: Creating Postgres Docker Container
 

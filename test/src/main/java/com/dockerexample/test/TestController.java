@@ -8,7 +8,7 @@ public class TestController {
 
     @GetMapping("/test")
     public String helloWorld() {
-        return "Hello World From Docker";
+        return "Hello World From Docker v4";
     }
 
 }

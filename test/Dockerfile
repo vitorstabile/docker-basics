@@ -4,10 +4,19 @@ FROM maven:3.8.6-openjdk-18-slim AS build
 # Set the working directory in the container
 WORKDIR /home/app
 
-# Copy the source code into the container
-COPY . /home/app
+# Copy the pom.xml to source code into the container
+COPY ./pom.xml /home/app/pom.xml
+
+# Copy the SpringBoot application entry point class (This not change in spring boot application)
+COPY ./src/main/java/com/dockerexample/test/TestApplication.java /home/app/src/main/java/com/dockerexample/test/TestApplication.java
 
 # Package the application
+RUN mvn -f /home/app/pom.xml clean package
+
+# Copy the source code into the container again
+COPY . /home/app
+
+# Package the application again. This will not take so long
 RUN mvn -f /home/app/pom.xml clean package
 
 # Use the same OpenJDK 18 runtime as a parent image
